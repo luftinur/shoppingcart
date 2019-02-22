@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Interaksi Keranjang Belanja | www.kodingspace.com</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500" rel="stylesheet">
+		<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="vendor/bs/bootstrap.min.css">
+		<script src="vendor/jquery.min.js"></script>
+		
+		
+		
+		<style>
+			body{
+				font-family:"Montserrat", sans-serif;
+			}
+			.jumbotron{
+				background-color:#eff2f5;
+			}
+			
+			
+
+			.card{
+				margin-top:1.5em;
+			
+			}
+			
+			
+			
+			/* START CART */
+			
+			
+			.cart-container{
+				width:100%;
+				height:100%;
+				
+				max-width:52px;
+				max-height:52px;
+				
+				background-color:#fafcff;
+				position:fixed;
+				top:15px;
+				right:15px;
+				border-radius:5px;
+				overflow:hidden;
+				z-index:999;
+				
+				box-shadow:0 0 15px rgba(0,0,0,0.1);
+				transition: max-height .4s .1s, max-width  .4s .1s, box-shadow .3s, opacity .3s .2s;
+				transition-timing-function: cubic-bezier(0.67, 0.17, 0.32, 0.95);
+			}
+			.cart-container .cart-wrapper{
+				opacity:0;
+				transition:all .3s ease-in-out;
+			}
+			.cart-header{
+				background-color:#FFFFFF;
+				padding-left:15px;
+				padding-right:15px;
+				height:52px;
+				line-height:48px;
+				display:block;
+				box-shadow:0 1px 5px rgba(0,0,0,0.2);
+			}
+			
+			.cart-content{	
+				overflow-y:auto;
+				overflow-x:hidden;
+				height:320px;
+			}
+			.cart-content > .cart-item{
+				padding:15px;	
+				position:relative;
+				border-bottom:1px solid #eef6ff;
+				
+			}
+			.cart-content > .cart-item > img{
+				float:left;
+				display:block;
+				width:80px;
+				border-radius:5px;
+				margin-right:15px;
+			}
+			
+			.cart-content > .cart-item > .text > .title{
+				font-size:14px;
+				display:block;
+				margin-top:5px;
+				column-count:2;
+			}
+			.cart-content > .cart-item > .text > .title > span{
+				display:block;
+			}
+			.cart-content > .cart-item > .text > .action{
+				font-size:12px;
+			}
+			
+			.cart-footer{
+				background-color:#138496;
+				color:#FFFFFF;
+				height:65px;
+				padding-left:15px;
+				padding-right:15px;
+				line-height:65px;
+				position:absolute;
+				bottom:0;
+				width:100%;
+				left:0;
+			}
+			
+			.cart-small{
+				position:absolute;
+				width:52px;
+				height:52px;
+				z-index:99999;
+				top:0;
+				left:0;
+				display:block;
+				background-color:#138496;
+				color:#FFFFFF;
+				font-size:20px;
+				line-height:52px;
+				text-align:center;
+				transition:all .3s ease-in-out;
+			}
+					
+			.cart-small:hover{
+				color:#FFFFFF;
+			}
+			
+			.cart-small-num{
+				position:absolute;
+				color:#FFFFFF;
+				font-size:12px;
+				top:-10px;
+				right:5px;
+			}
+												
+			.cart-container.opened{
+				
+				max-width:480px;
+				max-height:420px;
+				transition-delay: 0s;
+			}
+			
+			.cart-container.opened .cart-small{
+				z-index:1;
+				opacity:0;
+			}
+			
+			.cart-container.opened .cart-wrapper{
+				opacity:1;
+			}
+			
+			.cart-container.empty{
+				opacity:0;
+			}
+			
+			body::before{
+				content:"";
+				position:fixed;
+				width:0;
+				height:0;
+				top:0;
+				left:0;
+				opacity:0;
+				background-color:rgba(0,0,0,0.5);
+				transition: opacity .3s ease-in-out;
+				transition-delay:.2s;
+			}
+			body.cart-open::before{
+				opacity:1;
+				z-index:1;
+				width:100%;
+				height:100%;
+			}
+			
+			
+			
+			
+			#closeCart{
+				position:absolute;
+				width:52px;
+				height:52px;
+				right:0;
+				color:#218838;
+				background-color:#fafcff;
+				text-align:center;
+				font-size:22px;
+			}
+			
+			
+			
+			
+			
+		</style>
+		
+		
+		
+    </head>
+    <body>
+		<!-- Start Header Demo -->
+		<div class="jumbotron jumbotron-fluid">
+		
+		  <div class="container text-center">
+			<h1 class="display-5">Interaksi Keranjang Belanja</h1>
+			<p class="lead">Contoh interaksi keranjang belanja menggunakan jQuery.</p>
+		  </div>
+		  
+		</div>
+		
+		<!-- Start Sample Product -->
+		<div class="container mt-4">
+			<div class="row">
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 1">
+					  <div class="card-body">
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 2">
+					  <div class="card-body">
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 3">
+					  <div class="card-body">		
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 4">
+					  <div class="card-body">		
+						<a href="javascript:;" onclick="_addToCart();" class="btn btn-primary rounded-0 d-block"> Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 1">
+					  <div class="card-body">
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 2">
+					  <div class="card-body">
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 3">
+					  <div class="card-body">		
+						<a href="javascript:;"  onclick="_addToCart();" class="btn btn-primary rounded-0 d-block">Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+				<div class="col-md-3">
+				
+					<div class="card">
+					  <img class="card-img-top" src="sampel.jpg" alt="Produk 4">
+					  <div class="card-body">		
+						<a href="javascript:;" onclick="_addToCart();" class="btn btn-primary rounded-0 d-block"> Add To Cart</a>
+					  </div>
+					</div>
+					
+				</div>	
+				
+			</div>	
+		</div>	 
+		
+		
+		
+		<footer class="d-block p-4">
+			<div class="container  text-center">
+					<a href="https://www.kodingspace.com" class="d-block">Koding Space</a>
+			</div>
+		</footer>
+		
+	   
+		<!-- Start Keranjang Belanja -->
+		<div class="cart-container empty">
+			<a href="javascript:;" class="cart-small">
+				<i class="fa fa-shopping-cart"></i>
+				<span class="cart-small-num">0</span>
+			</a>
+			<div class="cart-wrapper">
+				<div class="cart-header">
+					<b>Keranjang Belanja</b>
+					<a href="javascript:;" id="closeCart"><i class="fa fa-close"></i></a>
+				</div>
+				<div class="cart-content">
+					
+				</div>
+				<div class="cart-footer">
+					<b>Total Belanja &nbsp;</b> <span>IDR. 0</span>
+				</div>
+			</div>
+			
+		</div>
+		
+		
+		
+		
+
+		
+		<script>
+			var $cartContainer = $(".cart-container"),
+				$cartContent = $(".cart-content"),
+				$closeCart = $("#closeCart"),				
+				$cartSmall = $(".cart-small"),
+				$cartSmallNum = $(".cart-small-num");
+				
+				$cartSmall.on("click", function(){
+					$("body").addClass("cart-open");
+					
+					$cartContainer.addClass("opened");
+				});
+			
+				$closeCart.on("click", function(){
+					$("body").removeClass("cart-open");
+					$cartContainer.removeClass("opened");
+				});
+			
+			
+			// Tambah Keranjang
+			function _addToCart(){
+			
+				var productItem = '<div class="cart-item">\
+						<img src="assets/img/product-1.jpg" />\
+						<div class="text">\
+							<h6 class="title">\
+								<span>Judul Produk </span>\
+								<span>IDR. 100,000</span>\
+							</h6>\
+							<div class="action">\
+								<a href="javascript:;" class="trash-item text-muted">Hapus</a>\
+							</div>\
+						</div>\
+					</div>';
+					
+				$cartContent.append(productItem);	
+				_cartTotalItem();
+				
+			}
+			
+			// Tambah Angka di Keranjang Belanja
+			function _cartTotalItem(){
+				
+				var countItem = $cartContent.children().length;
+				
+				// tutup cart bila total belanja = 0
+				if(countItem == 0 && $cartContainer.hasClass("opened")){
+					$cartContainer.removeClass("opened");
+					$("body").removeClass("cart-open");
+					$cartContainer.addClass("empty");
+				}else{
+					$cartContainer.removeClass("empty");
+				}
+				
+				$cartSmallNum.text(countItem);
+				
+			}
+			
+			
+			// Hapus Produk
+			$(document).on("click", ".trash-item", function(){
+				
+				// hapus elemen cart-item
+				$(this).parent().parent().parent().remove();
+				_cartTotalItem();
+			});
+			
+			
+		
+		</script>
+    </body>
+</html>
